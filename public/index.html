@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather & Map App</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+      #map {
+        height: 300px;
+        width: 100%;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Погода, Карта и Случайные Факты</h1>
+    <input type="text" id="city" placeholder="Введите название города" />
+    <button onclick="getWeather()">Получить данные</button>
+
+    <div id="weather"></div>
+    <div id="random"></div>
+    <div id="map"></div>
+
+    <script>
+      async function getWeather() {
+        const city = document.getElementById("city").value;
+
+        const weatherResponse = await fetch(
+          `http://localhost:3000/weather?city=${city}`
+        );
+        const weatherData = await weatherResponse.json();
+
+        const weatherDiv = document.getElementById("weather");
+        weatherDiv.innerHTML = `
+                <h2>Погода в ${city}</h2>
+                <p>Температура: ${weatherData.main.temp}°C</p>
+                <p>Описание: ${weatherData.weather[0].description}</p>
+            `;
+
+        const mapResponse = await fetch(
+          `http://localhost:3000/map?city=${city}`
+        );
+        const mapData = await mapResponse.json();
+        const coordinates = mapData.features[0].center;
+
+        const mapDiv = document.getElementById("map");
+        mapDiv.innerHTML = `<iframe width="600" height="300" src="https://www.google.com/maps?q=${coordinates[1]},${coordinates[0]}&z=15&output=embed"></iframe>`;
+
+        const randomResponse = await fetch("http://localhost:3000/random");
+        const randomData = await randomResponse.json();
+
+        const randomDiv = document.getElementById("random");
+        randomDiv.innerHTML = `<h3>Случайная информация:</h3><p>${randomData.fact}</p>`;
+      }
+    </script>
+  </body>
+</html>
